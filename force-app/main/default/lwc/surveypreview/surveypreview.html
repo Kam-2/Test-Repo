@@ -1,0 +1,164 @@
+<template>
+    <div class="image-container n_logo_container">
+        <img src={imageUrl_new} alt="My Image" />
+    </div>
+    <div class="top-left-container n_back_btn">
+        <lightning-button label="Back" title="Non-primary action" onclick={handlebackClick} class="slds-m-left_x-small">
+        </lightning-button>
+    </div>
+    <lightning-card class="n_survey_form">
+        <h1 style="text-transform: none;">{Surveyname}</h1>
+
+        <template if:true={surveyQuestions}>
+            <template for:each={surveyQuestions} for:item="question">
+                <template if:true={question.isVisible}>
+                <div key={question.Id} class="slds-grid slds-wrap slds-gutters n_survey_form_in">
+                    <div class="slds-col slds-size_4-of-12 questions">
+                        <lightning-formatted-text value={question.Name} class="all-question"></lightning-formatted-text>
+                        <template if:true={question.isRequired}>
+                            <span class="slds-text-color_error">*</span> <!-- Display asterisk for required fields -->
+                        </template>
+                    </div>
+                    <div class="slds-col slds-size_8-of-12">
+                        <template if:true={question.isStar}>
+                            <div class="slds-p-around_medium lgc-bg">
+                                <lightning-tile>
+                                    <lightning-avatar slot="media" fallback-icon-name="standard:person_account"
+                                        alternative-text="Pizza">
+                                    </lightning-avatar>
+                                    <div class="rate">
+                                        <input type="radio" id="star15" name={question.Id} value="5" onchange={handleRating} />
+                                        <label for="star15" title="5 stars">5 stars</label>
+                                        <input type="radio" id="star14" name={question.Id} value="4" onchange={handleRating} />
+                                        <label for="star14" title="4 stars">4 stars</label>
+                                        <input type="radio" id="star13" name={question.Id} value="3" onchange={handleRating} />
+                                        <label for="star13" title="3 stars">3 stars</label>
+                                        <input type="radio" id="star12" name={question.Id} value="2" onchange={handleRating} />
+                                        <label for="star12" title="2 stars">2 stars</label>
+                                        <input type="radio" id="star11" name={question.Id} value="1" onchange={handleRating} />
+                                        <label for="star11" title="1 star">1 star</label>
+                                    </div>
+                                    <template if:true={ratingDescription}>
+                                        <p class="slds-text-body_regular">Your rating: {ratingDescription}</p>
+                                    </template>
+                                </lightning-tile>
+                            </div>
+
+                        </template>
+                        <template if:true={question.ismap}>
+                            <!--iframe id="NewPublicAssetVF" src="/apex/NewpublicAsset"  allow="geolocation 'self' https://java-efficiency-6524--app--c.sandbox.vf.force.com" width="100%" height="550px" scrolling="No" style="border:0px solid #ccc !important;padding-bottom:0px !important;"> </iframe-->
+                            <iframe id="NewPublicAssetVF" data-question-id={question.Id}
+                                src="/apex/NewpublicAsset?questionId=${question.Id}"
+                                allow="geolocation 'self' https://java-efficiency-6524--app--c.sandbox.vf.force.com"
+                                width="100%" height="380px" scrolling="No"
+                                style="border:0px solid #ccc !important;padding-bottom:0px !important;"> </iframe>
+                        </template>
+
+                        <template if:true={question.isSlider}>
+                            <lightning-slider name={question.Id} label="Volume" value={val} min="1" max="10"
+                                onchange={handleSliderChange} step="1">
+                            </lightning-slider>
+                        </template>
+
+                        <template if:true={question.isText}>
+                            <lightning-input type="text" value={textValue} name={question.Id}
+                                onchange={handleTextInputChange} placeholder="Enter your text here">
+                            </lightning-input>
+                        </template>
+
+                        <template if:true={question.isNumber}>
+                            <lightning-input type="number" value={numberValue} name={question.Id}
+                                onchange={handleInputNumberChange} data-id="number">
+                            </lightning-input>
+
+                        </template>
+
+                        <template if:true={question.isEmail}>
+                            <lightning-input type="email" value={emailValue} name={question.Id}
+                                onchange={handleInputEmailChange} data-id="email">
+                            </lightning-input>
+
+                        </template>
+
+
+                        <template if:true={question.isdate}>
+                            <lightning-input class="strong-text" type="date" label="Date" value={dob} name={question.Id}
+                                onchange={handleInputDateChange} data-id="dob"></lightning-input>
+
+                        </template>
+
+                        <template if:true={question.isdatetime}>
+                            <lightning-input class="strong-text" type="datetime-local" label="Date and Time"
+                                value={dateTimeValue} name={question.Id} onchange={handleInputDateTimeChange}
+                                data-id="dateTime">
+                            </lightning-input>
+                        </template>
+
+                        <!-- Checkbox -->
+                        <template if:true={question.isCheckbox}>
+                            <template for:each={question.checkboxOptions} for:item="option">
+                                <lightning-input key={option} type="checkbox" label={option} name={question.Id}
+                                    value={option} onchange={handleCheckboxChange}>
+                                </lightning-input>
+                            </template></template>
+
+
+                        <template if:true={question.isMultiPicklist}>
+                            <lightning-dual-listbox name={question.Id} label="Select Options" source-label="Available"
+                                selected-label="Selected" field-level-help="Select one or more options"
+                                options={question.picklistOptions} onchange={handlePicklistChange}
+                                selected={selectedPicklistValues}>
+                            </lightning-dual-listbox>
+                        </template>
+                        <!-- Radio Button -->
+                        <template if:true={question.isRadio}>
+                            <!--<template for:each={question.radioOptions} for:item="option">-->
+
+                            <!--<lightning-input key={option} 
+ type="radio" label={option} name={question.Id} value={option} onchange={handleRadioChange}></lightning-input>-->
+                            <lightning-combobox name={question.Id} label="Select Option" value={selectedOption}
+                                options={question.radioOptions} onchange={handleOptionChange}>
+                            </lightning-combobox>
+                            <!--</template>-->
+                        </template>
+                       <template if:true={question.isFileUpload}>
+                            <div class="input-container">
+                                <lightning-input type="file" label="Select Multiple Files" multiple name="fileUpload"
+                                    onchange={handleUploadFinished}>
+                                </lightning-input>
+                                <template for:each={filesData} for:item="file" for:index="index">
+                                    <div key={file.name} class="uploaded-file-item">
+                                        &nbsp;
+                                        <template if:true={file.isImage}>
+                                            <img src={file.preview} alt="Image Preview" class="file-preview" />
+                                        </template>
+                                        <template if:false={file.isImage}>
+                                            <iframe src={file.preview} class="file-preview"></iframe>
+                                        </template>
+
+                                        <lightning-button-icon icon-name="utility:close" alternative-text="Remove"
+                                            title="Remove File" onclick={removeReceiptImage} data-index={index}>
+                                        </lightning-button-icon>
+                                    </div>
+                                </template>
+                            </div>
+                        </template>
+                    </div>
+                </div>
+                </template>
+            </template>
+            <button onclick={handleSubmit} disabled={isDisabled} class="buttons">Submit</button>
+
+
+        </template>
+        <template if:true={error}>
+            <p>{error}</p>
+        </template>
+        <template if:true={Thankyoupage}>
+            <div class="thank-you-message">
+                <p>Thank you for your submission!</p>
+            </div>
+        </template>
+    </lightning-card>
+
+</template>
